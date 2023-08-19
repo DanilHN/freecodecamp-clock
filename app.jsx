@@ -1,35 +1,9 @@
-/*
-reading task
-
-add gitignore
-
-create a plane :
-- how many component using :
-          - session (app with "id")
-          - break length
-          - session length 
-
-
-using react hooks?
-
-
-counter (timer(time display component  ) ) which receives input from break length  and session length components+
-
-add to buttons text coresponding to action name and transfer that action like a value to function and dispatch it.
- 
-
-create an one function to click +
-17/29
-User story #18
-
-how to stop counting
-*/
-
+//import React hoooks
 const { useEffect } = React;
 const { useState } = React;
 const { useRef } = React;
 
-
+//buttons, icons, ids
 const buttons = [
     { id: 'start_stop', action: "START_STOP", icon: <i className="fas fa-step-backward fa-lg"></i> },
     { id: 'break-decrement', action: "BREAK-DECREMENT", icon: <i className="fas fa-arrow-circle-down"></i> },
@@ -39,7 +13,7 @@ const buttons = [
     { id: 'reset', action: "RESET", icon: <i className="fas fa-retweet fa-lg"></i> },
 ]
 
-
+//break component
 const Break = ({ breakLenght, setUp }) => {
     return (
         <div id="break">
@@ -51,6 +25,7 @@ const Break = ({ breakLenght, setUp }) => {
     )
 }
 
+//session component
 const Session = ({ sessionLenght, setUp }) => {
     return (
         <div id="session">
@@ -63,6 +38,7 @@ const Session = ({ sessionLenght, setUp }) => {
     )
 }
 
+//timer 
 const Timer = ({ count, setUp, startStop, timeFormat, alarmColor, title }) => {
     return (
         <div id="timer">
@@ -76,7 +52,7 @@ const Timer = ({ count, setUp, startStop, timeFormat, alarmColor, title }) => {
 }
 
 
-
+//main component
 const App = () => {
     const [breakLenght, setBreakLenght] = useState(5);
     const [sessionLenght, setSessionLenght] = useState(25);
@@ -85,23 +61,25 @@ const App = () => {
     const [startStopState, setStartStopState] = useState(false);
     const audioElement = useRef(null);
     const [title, setTitle] = useState('Session')
+
+//setting timeformat
     const timeFormat = (time) => {
         let min = Math.floor(time / 60)
         let sec = time % 60
-
         return (
-
             (min < 10 ? "0" + min : min) +
             ":" +
             (sec < 10 ? "0" + sec : sec)
         )
     }
 
+//function to start or stop runnig timer, it switchs a true/false state of startStop
     const startStop = () => {
         setStartStopState(!startStopState)
-
     }
 
+//useEffect() hook is used to controls the timer 
+//new Date().getTime() is used to setting an accurate time count
     useEffect(() => {
         let intervalId;
         if (startStopState && count >= 0) {
@@ -135,6 +113,7 @@ const App = () => {
         return () => clearInterval(intervalId);
     }, [startStopState, breakLenght, sessionLenght, title, count])
 
+//one function to manage the controls elements 
     const setUp = (value) => {
         switch (value) {
             case ("SESSION-INCREMENT"):
