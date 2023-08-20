@@ -1,9 +1,9 @@
-//import React hoooks
+// import React Hooks
 const { useEffect } = React;
 const { useState } = React;
 const { useRef } = React;
 
-//buttons, icons, ids
+// buttons
 const buttons = [
     { id: 'start_stop', action: "START_STOP", icon: <i className="fas fa-step-backward fa-lg"></i> },
     { id: 'break-decrement', action: "BREAK-DECREMENT", icon: <i className="fas fa-arrow-circle-down"></i> },
@@ -13,7 +13,7 @@ const buttons = [
     { id: 'reset', action: "RESET", icon: <i className="fas fa-retweet fa-lg"></i> },
 ]
 
-//break component
+// break length component
 const Break = ({ breakLenght, setUp }) => {
     return (
         <div id="break">
@@ -25,7 +25,7 @@ const Break = ({ breakLenght, setUp }) => {
     )
 }
 
-//session component
+// session length component
 const Session = ({ sessionLenght, setUp }) => {
     return (
         <div id="session">
@@ -38,12 +38,12 @@ const Session = ({ sessionLenght, setUp }) => {
     )
 }
 
-//timer 
+// time left component
 const Timer = ({ count, setUp, startStop, timeFormat, alarmColor, title }) => {
     return (
         <div id="timer">
             <div id="timer-label">{title}</div>
-            <div id="time-left" style={alarmColor}>{count >= 0 ? timeFormat(count) : '00:00'}</div>
+            <div id="time-left">{count >= 0 ? timeFormat(count) : '00:00'}</div>
             <button id={buttons[0].id} onClick={() => startStop()}>{buttons[0].icon}</button>
             <button id={buttons[5].id} onClick={() => setUp(buttons[5].action)}>{buttons[5].icon}</button>
         </div>
@@ -52,17 +52,16 @@ const Timer = ({ count, setUp, startStop, timeFormat, alarmColor, title }) => {
 }
 
 
-//main component
+// main app
 const App = () => {
     const [breakLenght, setBreakLenght] = useState(5);
     const [sessionLenght, setSessionLenght] = useState(25);
-    const [count, setCount] = useState(sessionLenght * 60);
-    const [alarmColor, setAlarmColor] = useState({ color: 'black' });
+    const [count, setCount] = useState(25 * 60);
     const [startStopState, setStartStopState] = useState(false);
     const audioElement = useRef(null);
     const [title, setTitle] = useState('Session')
 
-//setting timeformat
+    // setting timeformat
     const timeFormat = (time) => {
         let min = Math.floor(time / 60)
         let sec = time % 60
@@ -73,47 +72,40 @@ const App = () => {
         )
     }
 
-//function to start or stop runnig timer, it switchs a true/false state of startStop
+    // function to start or stop runnig timer, it switchs a true/false state of startStop
     const startStop = () => {
         setStartStopState(!startStopState)
     }
 
-//useEffect() hook is used to controls the timer 
-//new Date().getTime() is used to setting an accurate time count
+    // useEffect() hook is used to controls the timer
     useEffect(() => {
         let intervalId;
         if (startStopState && count >= 0) {
-            let second = 1000;
-            let date = new Date().getTime();
-            let nextDate = new Date().getTime() + second;
-            if (count === 0) {
-                audioElement.current.play();
-                setAlarmColor({color: 'red'})
-            }
             intervalId = setInterval(() => {
-                date = new Date().getTime();
-                if (date > nextDate) {
-                    setCount(prev => {
-                        return prev - 1
-                    })
-                    nextDate += second;
-                }
-
-            }, 30);
+                setCount(prev => {
+                    return prev - 1
+                })
+            }, 1000);
         } else if (startStopState && count < 0) {
-            setAlarmColor({color: 'black'})
             if (title === 'Session') {
                 setTitle('Break')
+                console.log('we are in the Break')
                 setCount(breakLenght * 60)
             } else {
                 setTitle('Session')
+                console.log('we are in the Session')
                 setCount(sessionLenght * 60)
             }
         }
         return () => clearInterval(intervalId);
     }, [startStopState, breakLenght, sessionLenght, title, count])
 
-//one function to manage the controls elements 
+    // function activates an alarm sound
+    if (count == 0) {
+        audioElement.current.play();
+    }
+
+    // one function to manage the controls elements 
     const setUp = (value) => {
         switch (value) {
             case ("SESSION-INCREMENT"):
@@ -140,13 +132,12 @@ const App = () => {
                 }
                 break;
             case ("RESET"):
-                audioElement.current.load();
                 setBreakLenght(5);
                 setSessionLenght(25)
                 setCount(25 * 60)
                 setStartStopState(false)
                 setTitle('Session')
-                setAlarmColor({color: 'black'})
+                audioElement.current.load();
                 break;
         }
     }
@@ -155,8 +146,8 @@ const App = () => {
         <div id='app'>
             <Break breakLenght={breakLenght} setUp={setUp} />
             <Session setUp={setUp} sessionLenght={sessionLenght} />
-            <Timer count={count} title={title} setUp={setUp} startStop={startStop} timeFormat={timeFormat} alarmColor={alarmColor} />
-            <audio 
+            <Timer count={count} title={title} setUp={setUp} startStop={startStop} timeFormat={timeFormat} />
+            <audio controls
                 id='beep'
                 src='https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav'
                 type='audio/wav'
@@ -168,4 +159,7 @@ const App = () => {
     )
 }
 
+
+
 ReactDOM.render(<App />, document.getElementById('my-app'))
+
