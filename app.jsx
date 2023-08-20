@@ -89,11 +89,9 @@ const App = () => {
         } else if (startStopState && count < 0) {
             if (title === 'Session') {
                 setTitle('Break')
-                console.log('we are in the Break')
                 setCount(breakLenght * 60)
             } else {
                 setTitle('Session')
-                console.log('we are in the Session')
                 setCount(sessionLenght * 60)
             }
         }
